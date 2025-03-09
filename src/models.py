@@ -1,6 +1,7 @@
 import datetime
-from flask_sqlalchemy import SQLAlchemy
 import logging
+import time
+from flask_sqlalchemy import SQLAlchemy
 
 
 db = SQLAlchemy()
@@ -55,6 +56,7 @@ class Quote(db.Model):
         self.submitted_by = submitted_by
         self.is_community_qod = is_community_qod
         self.is_featured_qod = is_featured_qod
+
 
 class Vote(db.Model):
     __tablename__ = 'votes'
@@ -114,6 +116,7 @@ quote_categories = db.Table('quote_categories',
 
 # Function to initialize predefined categories
 def initialize_categories():
+    start_time = time.time()
     predefined_categories = [
         "inspire", "management", "sports", "life", "funny", "love", "art", "students"
     ]
@@ -124,3 +127,5 @@ def initialize_categories():
             db.session.add(new_category)
             logger.debug(f"Added predefined category: {category_name}")
     db.session.commit()
+    end_time = time.time()
+    logger.info(f"initialize_categories execution time: {end_time - start_time:.5f} seconds")
