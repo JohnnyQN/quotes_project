@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit a Quote</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    {% include 'nav.html' %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Quotes App</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                {% if session.user_id %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('routes.logout') }}">Logout</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('routes.signup') }}">Sign Up</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('routes.login') }}">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h1>Submit a New Quote</h1>
+        <form method="POST" action="{{ url_for('routes.new_quote') }}">
+            <!-- Use form.hidden_tag() to add CSRF protection properly -->
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                <label for="text">Quote Text</label>
+                {{ form.text(class="form-control", id="text", placeholder="Enter quote here") }}
+            </div>
+            <div class="form-group">
+                <label for="author">Author</label>
+                {{ form.author(class="form-control", id="author", placeholder="Unknown") }}
+            </div>
+            <div class="form-group">
+                <label for="categories">Categories</label>
+                {{ form.categories(class="form-control", id="categories") }}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

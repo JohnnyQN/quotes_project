@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}All Quotes - Quotes App{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>All Quotes</h1>
+        <form method="GET" action="{{ url_for('routes.view_quotes') }}" class="form-inline">
+            <input type="text" name="search" value="{{ search_query }}" class="form-control mr-sm-2" placeholder="Search quotes, authors, users" style="width: 250px;">
+            <button type="submit" class="btn btn-primary my-2 my-sm-0">Search</button>
+        </form>
+    </div>
+
+    <div id="accordion">
+        <!-- Categorized Quotes -->
+        {% if paginated_categories %}
+            {% for category, quotes in paginated_categories %}
+            <div class="card mb-3">
+                <div class="card-header" id="heading-{{ category }}">
+                    <h5 class="mb-0">
+                        <form method="GET" action="{{ url_for('routes.view_quotes') }}" class="d-inline">
+                            <input type="hidden" name="expanded_categories" value="{% if category in expanded_categories %}{{ expanded_categories | join(',') | replace(category, '') | trim(',') }}{% else %}{{ (expanded_categories | join(',')) | trim(',') }},{{ category }}{% endif %}">
+                            <input type="hidden" name="page" value="{{ page }}">
+                            <input type="hidden" name="search" value="{{ search_query }}">
+                            <button type="submit" class="btn btn-link category-toggle-btn">
+                                {{ category | title }} ({{ quotes | length }} quotes)
+                            </button>
+                        </form>
+                    </h5>
+                </div>
+
+                {% if category in expanded_categories %}
+                <div id="collapse-{{ category }}" class="collapse show" aria-labelledby="heading-{{ category }}" data-parent="#accordion">
+                    <div class="card-body">
+                        <div class="row">
+                            {% for quote in quotes %}
+                            <div id="quote-{{ quote.id }}" class="col-md-6 mb-4">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <blockquote class="blockquote mb-0">
+                                            <p>{{ quote.text }}</p>
+                                            {% if quote.author %}
+                                            <footer class="blockquote-footer">{{ quote.author }}</footer>
+                                            {% else %}
+                                            <footer class="blockquote-footer text-muted">Unknown Author</footer>
+                                            {% endif %}
+                                        </blockquote>
+                                        {% if quote.submitted_by %}
+                                        <p class="text-muted mt-3">
+                                            <i class="fas fa-user"></i> Submitted by: {{ quote.user.username }}
+                                        </p>
+                                        {% else %}
+                                        <p class="text-muted mt-3">
+                                            <i class="fas fa-user"></i> Submitted by: Unknown
+                                        </p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-footer bg-white d-flex justify-content-between align-items-center flex-wrap">
+                                        <div class="d-flex align-items-center mr-2">
+                                            <form method="POST" action="{{ url_for('routes.vote_quote', quote_id=quote.id) }}#quote-{{ quote.id }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="vote_type" value="upvote">
+                                                <input type="hidden" name="expanded_categories" value="{{ expanded_categories | join(',') }}">
+                                                <input type="hidden" name="page" value="{{ page }}">
+                                                <input type="hidden" name="search" value="{{ search_query }}">
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-thumbs-up"></i> Upvote
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('routes.vote_quote', quote_id=quote.id) }}#quote-{{ quote.id }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="vote_type" value="downvote">
+                                                <input type="hidden" name="expanded_categories" value="{{ expanded_categories | join(',') }}">
+                                                <input type="hidden" name="page" value="{{ page }}">
+                                                <input type="hidden" name="search" value="{{ search_query }}">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-thumbs-down"></i> Downvote
+                                                </button>
+                                            </form>
+                                            <span class="ml-2 text-success">Upvotes: {{ quote.upvotes }}</span>
+                                            <span class="ml-2 text-danger">Downvotes: {{ quote.downvotes }}</span>
+                                        </div>
+                                        <div class="social-sharing ml-auto">
+                                            <a href="https://twitter.com/intent/tweet?text={{ quote.text|urlencode }} - {{ quote.author|default('Unknown')|urlencode }}" target="_blank" class="btn btn-outline-primary btn-sm mr-1">
+                                                <i class="fab fa-twitter"></i> Tweet
+                                            </a>
+                                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ url_for('routes.view_quotes', _external=True) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                                <i class="fab fa-facebook-f"></i> Facebook
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Uncategorized Quotes (Explicitly on the Last Page) -->
+        {% if page == total_pages and uncategorized_quotes %}
+        <div class="card mb-3">
+            <div class="card-header" id="heading-uncategorized">
+                <h5 class="mb-0">
+                    <form method="GET" action="{{ url_for('routes.view_quotes') }}" class="d-inline">
+                        <input type="hidden" name="expanded_categories" value="{% if 'uncategorized' in expanded_categories %}{{ expanded_categories | join(',') | replace('uncategorized', '') | trim(',') }}{% else %}{{ (expanded_categories | join(',')) | trim(',') }},uncategorized{% endif %}">
+                        <input type="hidden" name="page" value="{{ page }}">
+                        <input type="hidden" name="search" value="{{ search_query }}">
+                        <button type="submit" class="btn btn-link category-toggle-btn">
+                            Uncategorized Quotes ({{ uncategorized_quotes | length }} quotes)
+                        </button>
+                    </form>
+                </h5>
+            </div>
+            {% if 'uncategorized' in expanded_categories %}
+            <div id="collapse-uncategorized" class="collapse show" aria-labelledby="heading-uncategorized" data-parent="#accordion">
+                <div class="card-body">
+                    <div class="row">
+                        {% for quote in uncategorized_quotes %}
+                        <div id="quote-{{ quote.id }}" class="col-md-6 mb-4">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <blockquote class="blockquote mb-0">
+                                        <p>{{ quote.text }}</p>
+                                        {% if quote.author %}
+                                        <footer class="blockquote-footer">{{ quote.author }}</footer>
+                                        {% else %}
+                                        <footer class="blockquote-footer text-muted">Unknown Author</footer>
+                                        {% endif %}
+                                    </blockquote>
+                                    {% if quote.submitted_by %}
+                                    <p class="text-muted mt-3">
+                                        <i class="fas fa-user"></i> Submitted by: {{ quote.user.username }}
+                                    </p>
+                                    {% else %}
+                                    <p class="text-muted mt-3">
+                                        <i class="fas fa-user"></i> Submitted by: Unknown
+                                    </p>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-white d-flex justify-content-between align-items-center flex-wrap">
+                                    <div class="d-flex align-items-center mr-2">
+                                        <form method="POST" action="{{ url_for('routes.vote_quote', quote_id=quote.id) }}#quote-{{ quote.id }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="vote_type" value="upvote">
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fas fa-thumbs-up"></i> Upvote
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('routes.vote_quote', quote_id=quote.id) }}#quote-{{ quote.id }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="vote_type" value="downvote">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-thumbs-down"></i> Downvote
+                                            </button>
+                                        </form>
+                                        <span class="ml-2 text-success">Upvotes: {{ quote.upvotes }}</span>
+                                        <span class="ml-2 text-danger">Downvotes: {{ quote.downvotes }}</span>
+                                    </div>
+                                    <div class="social-sharing ml-auto">
+                                        <a href="https://twitter.com/intent/tweet?text={{ quote.text|urlencode }} - {{ quote.author|default('Unknown')|urlencode }}" target="_blank" class="btn btn-outline-primary btn-sm mr-1">
+                                            <i class="fab fa-twitter"></i> Tweet
+                                        </a>
+                                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ url_for('routes.view_quotes', _external=True) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                            <i class="fab fa-facebook-f"></i> Facebook
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Quotes pagination">
+        <ul class="pagination justify-content-center">
+            {% if page > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('routes.view_quotes', page=page-1, search=search_query, expanded_categories=expanded_categories|join(',')) }}">Previous</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Previous</span>
+            </li>
+            {% endif %}
+
+            {% for page_num in range(1, total_pages + 1) %}
+                {% if page_num == page %}
+                <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('routes.view_quotes', page=page_num, search=search_query, expanded_categories=expanded_categories|join(',')) }}">{{ page_num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page < total_pages %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('routes.view_quotes', page=page+1, search=search_query, expanded_categories=expanded_categories|join(',')) }}">Next</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Next</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <script>
+        // Store the scroll position when expanding or collapsing categories
+        document.querySelectorAll('.category-toggle-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                localStorage.setItem('scrollPosition', window.scrollY);
+            });
+        });
+
+        // Restore the scroll position on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const scrollPosition = localStorage.getItem('scrollPosition');
+            if (scrollPosition) {
+                window.scrollTo(0, parseInt(scrollPosition, 10));
+                localStorage.removeItem('scrollPosition');
+            }
+        });
+    </script>
+{% endblock %}
