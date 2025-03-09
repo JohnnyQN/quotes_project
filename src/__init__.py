@@ -7,6 +7,10 @@ from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 from flask_cors import CORS
 from flask_migrate import Migrate
+<<<<<<< HEAD
+=======
+import os
+>>>>>>> b196968 (Reinitialize repository with current project files)
 
 # Load environment variables from .env file
 load_dotenv()

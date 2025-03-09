@@ -1,0 +1,58 @@
+9eab476 Updated README with latest project details
+8e3590d Initial commit for Render deployment
+39797aa Final updates
+c494364 Clean cache and reindex
+b74c51f Stamped manual migration as applied to avoid conflicts
+4c16c70 Updated env.py to include model references
+5b855f4 Add migration versions to version control
+9dd7932 Include migration versions in version control
+e2c7c10 Add APScheduler to requirements
+6b14815 Add psycopg2-binary to requirements
+3820572 Add Flask-Migrate to requirements
+35ffd75 Fix dotenv import and update Procfile
+6c3738a Add dotenv import and update requirements
+b6d8bcd Add Flask-Session to requirements
+f530f18 Updated pagination files
+bf01ee9 Updated requirements
+431c614 Add email-validator dependency for email validation
+bbb4049 Update dependencies to resolve Markup import error
+74a15fa Add Flask-CORS to requirements.txt
+2586410 Add Flask-CORS to requirements.txt
+e8c3bc5 Repopulate requirements.txt with dependencies
+9afe45b Add manage.py for Flask commands
+a7c55e2 Moved Migrate initialization to app.py for better CLI integration
+1a1d9fd Fix outdated imports from quotes_project to src
+2b7ffef Fix outdated imports from quotes_project to src
+d7ca192 Reorganize files and update imports for src structure
+9e94b5e Update Procfile and debug directory issues
+c167ab1 Update Procfile and add debugging info for Heroku deployment
+713de83 Fix imports and update Procfile for Heroku deployment
+b3af294 Restore Procfile and requirements.txt to root directory for Heroku deployment
+ca902da Move Procfile and requirements.txt to root directory for Heroku deployment
+b5167ca Fix module path issue and update Procfile
+49513d7 Fix relative import errors by using absolute imports
+16eca48 Fix import errors and update Procfile
+ff4b8c4 Database migration setup and app updates
+1695e1b Restore requirements.txt file with dependencies
+3bde255 Fixed module import issues and migration setup
+0cfabf5 Update Procfile and app initialization for Heroku deployment
+fbb717e Initial commit for quotablyquotify
+d302a68 Fix SQLAlchemy database URL format for Heroku deployment
+dee3efe Fix instance path issue for Heroku deployment
+4b4daa0 Fix imports for Heroku deployment
+e4d7ed3 Prepare for Heroku deployment
+8db2d59 Fix import paths for Heroku deployment
+89335a6 Fix module import paths
+6b4d523 Fix import error for models
+f94c672 Add gunicorn to requirements
+961433b Update runtime and requirements
+519bc5d Removed backports.zoneinfo and updated requirements
+1914b9c Initial commit for Quotes App
+3aec08b Update Python version and dependencies for Heroku
+6181554 Update Python version and dependencies for Heroku
+d3178aa Update Procfile for gunicorn deployment
+0558828 Update runtime to Python 3.9
+0785d4e Update runtime to Python 3.8
+89262c1 Specify Python 3.7 runtime for Heroku
+01f5dd1 Update numpy to a compatible version
+b7795de Prepare for Heroku deployment

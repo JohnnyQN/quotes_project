@@ -138,18 +138,15 @@ def login():
         logger.debug("Login form submitted.")
         username = request.form.get('username')
         password = request.form.get('password')
-
         user = User.query.filter_by(username=username).first()
         if not user or not check_password_hash(user.password_hash, password):
             logger.warning(f"Login failed for username: {username}")
             flash('Invalid username or password.', 'danger')
             return redirect(url_for('routes.login'))
-
         session['user_id'] = user.id
         session.modified = True
         flash('Login successful!', 'success')
         return redirect(url_for('routes.home'))
-
     return render_template('login.html')
 
 @routes.route('/logout')
@@ -164,7 +161,6 @@ def logout():
 @cross_origin()
 def view_quotes():
     logger.debug("View quotes page accessed.")
-
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     search_query = request.args.get('search', '').strip()
@@ -193,7 +189,6 @@ def view_quotes():
 
     sorted_categories = dict(sorted(categorized_quotes.items()))
     category_list = list(sorted_categories.items())
-
     total_categories = len(category_list)
     total_pages = (total_categories // per_page) + (1 if total_categories % per_page != 0 else 0)
     if uncategorized_quotes:
@@ -231,7 +226,6 @@ def new_quote():
             logger.warning("User must be logged in to submit a quote.")
             flash('You need to be logged in to submit a quote.', 'warning')
             return redirect(url_for('routes.login'))
-
         new_quote_obj = Quote(
             text=form.text.data,
             author=form.author.data,
@@ -247,7 +241,6 @@ def new_quote():
         logger.info("New quote submitted successfully.")
         flash('Quote submitted successfully!', 'success')
         return redirect(url_for('routes.view_quotes'))
-
     logger.debug("Rendering new quote form.")
     return render_template('submit_quote.html', form=form)
 
@@ -258,13 +251,11 @@ def preferences():
         logger.warning("Attempt to access preferences without logging in.")
         flash('You need to be logged in to set preferences.', 'warning')
         return redirect(url_for('routes.login'))
-
     user = User.query.get(session['user_id'])
     categories = Category.query.all()
     if not categories:
         logger.debug("No categories available, rendering an empty form.")
         return render_template('preferences.html', user=user, categories=categories)
-
     if request.method == "POST":
         logger.debug("Preferences form submitted.")
         selected_category_ids = request.form.getlist('categories')
@@ -307,7 +298,6 @@ def vote_quote(quote_id):
             logger.debug(f"Creating new Vote: User ID {user_id}, Quote ID {quote_id}, Vote Type {vote_type}")
             new_vote = Vote(user_id=user_id, quote_id=quote_id, vote_type=vote_type)
             db.session.add(new_vote)
-
             if vote_type == 'upvote':
                 quote.upvotes += 1
             elif vote_type == 'downvote':
@@ -328,7 +318,6 @@ def vote_quote(quote_id):
                     quote.upvotes -= 1
                 elif existing_vote.vote_type == 'downvote':
                     quote.downvotes -= 1
-
                 existing_vote.vote_type = vote_type
                 if vote_type == 'upvote':
                     quote.upvotes += 1
@@ -348,7 +337,6 @@ def vote_quote(quote_id):
                                                search=search_query,
                                                expanded_categories=expanded_categories)
         return redirect(next_page + f"#quote-{quote_id}")
-
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error occurred during voting process: {str(e)}")

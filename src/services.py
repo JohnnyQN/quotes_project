@@ -36,7 +36,6 @@ def fetch_new_quote_from_api(today):
         "Authorization": f"Bearer {os.getenv('API_TOKEN')}",
         "Accept": "application/json"
     }
-
     try:
         response = requests.get(api_url, headers=headers)
         response.raise_for_status()
@@ -195,7 +194,6 @@ def get_categorized_quotes():
         for category in quote.categories:
             normalized_category = category.name.strip().lower()
             categorized_quotes[normalized_category].append(quote)
-
     logger.info(f"Total categorized quotes count: {len(categorized_quotes)}")
     return dict(categorized_quotes)
 
